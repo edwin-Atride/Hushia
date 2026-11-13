@@ -1,0 +1,126 @@
+
+:root {
+    --bg: #101016;
+    --surface: #1c1b27;
+    --text: #f5f4fa;
+    --muted: #aaa6bb;
+    --purple: #9b72f6;
+    --pink: #e58acb;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+}
+
+body > main {
+    flex: 1;
+}
+
+.hush-navbar {
+    background: #17161f;
+    border-bottom: 1px solid #292638;
+    padding: 18px 0;
+}
+
+.hush-logo {
+    color: white;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.hush-logo:hover, .nav-link:hover {
+    color: var(--pink);
+}
+
+.hush-logo span, h1 span {
+    color: var(--purple);
+}
+
+.nav-link {
+    color: var(--text);
+}
+
+.hush-btn {
+    background: var(--purple);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 24px;
+}
+
+.hush-btn:hover {
+    background: var(--pink);
+    color: #101016;
+}
+
+.hero, .auth-page {
+    min-height: 75vh;
+    padding-top: 60px;
+    padding-bottom: 60px;
+}
+
+.hero h1 {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
+}
+
+.hero-description {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 550px;
+}
+
+.hero-tag {
+    color: var(--pink);
+}
+
+.auth-card {
+    background: var(--surface);
+    border: 1px solid #373248;
+    border-radius: 18px;
+    padding: 38px;
+    width: 100%;
+    max-width: 430px;
+}
+
+.auth-card h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.form-control {
+    background: #12111a;
+    border: 1px solid #454052;
+    color: white;
+    padding: 12px;
+}
+
+.form-control:focus {
+    background: #12111a;
+    color: white;
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px #9b72f633;
+}
+
+.form-control::placeholder {
+    color: #858096;
+}
+
+.muted, .hush-footer {
+    color: var(--muted);
+}
+
+.hush-footer {
+    border-top: 1px solid #292638;
+}
+
+@media (max-width: 576px) {
+    .auth-card {
+        padding: 24px;
+    }
+}

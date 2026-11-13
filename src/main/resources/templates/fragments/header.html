@@ -1,0 +1,17 @@
+
+<header xmlns:th="http://www.thymeleaf.org"
+        th:fragment="header"
+        class="navbar navbar-expand-lg hush-navbar">
+    <div class="container">
+        <a class="navbar-brand hush-logo" th:href="@{/}">
+            Hush<span>IA</span>
+        </a>
+
+        <nav class="ms-auto d-flex gap-3 align-items-center">
+            <a th:href="@{/}" class="nav-link">Accueil</a>
+            <a th:href="@{/connexion}" class="btn hush-btn">
+                Connexion
+            </a>
+        </nav>
+    </div>
+</header>

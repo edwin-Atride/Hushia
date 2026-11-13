@@ -1,0 +1,24 @@
+
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::main})}">
+<body>
+<main class="container hero d-flex align-items-center justify-content-center">
+    <div class="text-center">
+        <div class="hero-tag mb-4">Votre espace d'intelligence artificielle</div>
+
+        <h1>Bienvenue sur <span>Hush IA</span></h1>
+        <p class="hero-description mx-auto mt-4">
+            Une interface simple et intuitive pour échanger
+            avec l'intelligence artificielle.
+        </p>
+
+        <div class="mt-4">
+            <a th:href="@{/connexion}" class="btn hush-btn btn-lg">
+                Commencer
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>
