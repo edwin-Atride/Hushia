@@ -1,24 +1,136 @@
 
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
       th:replace="~{base :: layout(~{::main})}">
-<body>
-<main class="container hero d-flex align-items-center justify-content-center">
-    <div class="text-center">
-        <div class="hero-tag mb-4">Votre espace d'intelligence artificielle</div>
 
-        <h1>Bienvenue sur <span>Hush IA</span></h1>
-        <p class="hero-description mx-auto mt-4">
-            Une interface simple et intuitive pour échanger
-            avec l'intelligence artificielle.
+<main class="chat-page">
+
+    <!-- ACCUEIL DU CHAT -->
+    <section class="chat-content" id="chatContent">
+
+        <div class="welcome" id="welcome">
+
+            <div class="spike-icon">
+                <svg viewBox="0 0 64 80"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 7 L44 7 L51 21 L44 30
+                             L49 65 L32 75 L15 65 L20 30
+                             L13 21 Z"
+                          fill="#36333e"
+                          stroke="currentColor"
+                          stroke-width="3"/>
+                    <path d="M17 20 L25 11 L39 11 L47 20
+                             L39 27 L25 27 Z"
+                          fill="#d9d8df"/>
+                    <path d="M27 31 L37 31 L37 61 L27 61 Z"
+                          fill="currentColor"/>
+                    <path d="M18 65 L25 59 L32 70
+                             L39 59 L46 65 L32 76 Z"
+                          fill="#a9a7b3"/>
+                </svg>
+            </div>
+
+            <h2>Bienvenue sur Valorant IA</h2>
+
+            <p>
+                Discute avec ton agent préféré et améliore
+                tes stratégies sur Valorant.
+            </p>
+
+            <div class="suggestions">
+                <button type="button"
+                        onclick="questionRapide('Comment améliorer mon aim ?')">
+                    🎯 Améliorer mon aim
+                </button>
+
+                <button type="button"
+                        onclick="questionRapide('Comment mieux jouer en attaque ?')">
+                    ⚔️ Stratégies en attaque
+                </button>
+
+                <button type="button"
+                        onclick="questionRapide('Comment progresser en ranked ?')">
+                    🏆 Progresser en ranked
+                </button>
+
+                <button type="button"
+                        onclick="questionRapide('Comment bien jouer Phoenix ?')">
+                    🔥 Conseils sur Phoenix
+                </button>
+            </div>
+        </div>
+
+        <!-- LES MESSAGES S'AFFICHENT ICI -->
+        <div id="messages" class="messages"></div>
+
+    </section>
+
+    <!-- ZONE DE COMPOSITION -->
+    <section class="chat-bottom">
+
+        <div class="chat-options">
+
+            <label class="agent-selector">
+                <span>Personnalité IA</span>
+
+                <select id="agentSelect"
+                        onchange="changerAgent()">
+
+                    <option value="Phoenix">
+                        Phoenix — Gratuit
+                    </option>
+
+                    <option value="Yoru" disabled>
+                        Yoru — Premium
+                    </option>
+
+                    <option value="Skye" disabled>
+                        Skye — Premium
+                    </option>
+
+                    <option value="Chamber" disabled>
+                        Chamber — Premium
+                    </option>
+
+                    <option value="Jett" disabled>
+                        Jett — Premium
+                    </option>
+
+                    <option value="Sage" disabled>
+                        Sage — Premium
+                    </option>
+
+                </select>
+            </label>
+
+            <div class="agent-info">
+                <span id="agentBadge">🔥</span>
+                <span id="agentName">Phoenix</span>
+                <span id="agentAccess">Gratuit</span>
+            </div>
+
+        </div>
+
+        <form class="composer" id="chatForm">
+
+            <textarea
+                    id="messageInput"
+                    placeholder="Pose ta question sur Valorant..."
+                    rows="1"
+                    required></textarea>
+
+            <button type="submit" class="send-btn">
+                ➤
+            </button>
+
+        </form>
+
+        <p class="chat-disclaimer">
+            Maquette interactive — Réponses IA simulées.
         </p>
 
-        <div class="mt-4">
-            <a th:href="@{/connexion}" class="btn hush-btn btn-lg">
-                Commencer
-            </a>
-        </div>
-    </div>
+    </section>
+
 </main>
-</body>
 </html>

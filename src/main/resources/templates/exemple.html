@@ -1,11 +1,60 @@
 
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
       th:replace="~{base :: layout(~{::main})}">
-<body>
-<main class="container py-5">
-    <h1>Nouvelle page Hush IA</h1>
-    <p>Ce template sert de point de départ.</p>
+
+<main class="content-page">
+
+    <h2>Les protocoles Valorant IA</h2>
+
+    <p class="page-subtitle">
+        Deux interfaces, une seule expérience.
+    </p>
+
+    <div class="info-grid">
+
+        <article class="info-card alpha-card">
+            <div class="protocol-symbol">α</div>
+            <h3>Protocole Alpha</h3>
+            <p>
+                Une interface claire avec du blanc
+                et du rouge.
+            </p>
+            <p>
+                Adaptée à une utilisation simple
+                et rapide.
+            </p>
+        </article>
+
+        <article class="info-card omega-card">
+            <div class="protocol-symbol">Ω</div>
+            <h3>Protocole Omega</h3>
+            <p>
+                Une interface sombre avec du noir
+                et du violet.
+            </p>
+            <p>
+                Une apparence différente pour
+                personnaliser ton expérience.
+            </p>
+        </article>
+
+    </div>
+
+    <div class="info-card">
+        <h3>Personnalités des agents IA</h3>
+
+        <p>
+            Phoenix est disponible gratuitement.
+        </p>
+
+        <p>
+            Les utilisateurs Premium peuvent choisir
+            d'autres personnalités :
+            Yoru, Skye, Chamber, Jett et Sage.
+        </p>
+    </div>
+
 </main>
-</body>
 </html>

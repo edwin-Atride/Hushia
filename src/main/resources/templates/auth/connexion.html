@@ -1,43 +1,177 @@
 
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{base :: layout(~{::main})}">
-<body>
-<main class="container auth-page d-flex align-items-center justify-content-center">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 
-    <div class="auth-card">
-        <div class="text-center mb-4">
-            <h1>Bon retour sur <span>Hush IA</span></h1>
-            <p class="muted">Connectez-vous à votre espace.</p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Connexion - Valorant IA</title>
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body class="alpha">
+
+<div class="login-page">
+
+    <div class="login-card">
+
+        <!-- CHOIX DU PROTOCOLE -->
+        <div class="login-protocol-switch">
+
+            <button type="button"
+                    id="alphaLogin"
+                    class="protocol-btn active"
+                    onclick="choisirProtocole('alpha')">
+                α Alpha
+            </button>
+
+            <button type="button"
+                    id="omegaLogin"
+                    class="protocol-btn"
+                    onclick="choisirProtocole('omega')">
+                Ω Omega
+            </button>
+
         </div>
 
+        <!-- LOGO -->
+        <img th:src="@{/img/logo.png}"
+             alt="Valorant IA"
+             class="login-logo">
+
+        <h1>Valorant IA</h1>
+
+        <p>Bienvenue sur ton assistant Valorant.</p>
+
+        <!-- FORMULAIRE -->
         <form id="loginForm">
-            <div class="mb-3">
-                <label for="email" class="form-label">
-                    Adresse e-mail
-                </label>
-                <input type="email" class="form-control"
-                       id="email" name="email"
-                       placeholder="exemple@email.com" required>
-            </div>
 
-            <div class="mb-4">
-                <label for="password" class="form-label">
-                    Mot de passe
-                </label>
-                <input type="password" class="form-control"
-                       id="password" name="password"
-                       placeholder="Votre mot de passe" required>
-            </div>
+            <label for="username">Identifiant</label>
 
-            <button type="submit" class="btn hush-btn w-100">
+            <input type="text"
+                   id="username"
+                   placeholder="Ton identifiant"
+                   autocomplete="username"
+                   required>
+
+            <label for="password">Mot de passe</label>
+
+            <input type="password"
+                   id="password"
+                   placeholder="Ton mot de passe"
+                   autocomplete="current-password"
+                   required>
+
+            <button type="submit" class="primary">
                 Se connecter
             </button>
 
-            <p id="loginMessage" class="muted text-center mt-3"
-               aria-live="polite"></p>
         </form>
+
+        <!-- COMPTES DE DEMONSTRATION -->
+        <div class="demo-accounts">
+
+            <p>Ou tester avec un compte</p>
+
+            <button type="button"
+                    class="demo-btn"
+                    onclick="connexionDemo('admin')">
+                ⚙ Administrateur
+            </button>
+
+            <button type="button"
+                    class="demo-btn"
+                    onclick="connexionDemo('premium')">
+                ★ Premium
+            </button>
+
+            <button type="button"
+                    class="demo-btn"
+                    onclick="connexionDemo('user')">
+                ♙ Utilisateur
+            </button>
+
+        </div>
+
+        <p class="small-note">
+            Version de démonstration
+        </p>
+
     </div>
-</main>
+
+</div>
+
+<script th:inline="javascript">
+    const chatUrl = /*[[@{/chat}]]*/ "/chat";
+</script>
+
+<script th:src="@{/js/app.js}"></script>
+
+<script>
+    // Protocoles de couleur
+    function choisirProtocole(protocole) {
+        changerProtocole(protocole);
+
+        document.getElementById("alphaLogin")
+            .classList.toggle("active", protocole === "alpha");
+
+        document.getElementById("omegaLogin")
+            .classList.toggle("active", protocole === "omega");
+    }
+
+    // Connexion de démonstration
+    function connexionDemo(role) {
+        const pseudo = {
+            admin: "Administrateur",
+            premium: "Premium",
+            user: "Utilisateur"
+        };
+
+        localStorage.setItem("valorantDemoRole", role);
+        localStorage.setItem("valorantPseudo", pseudo[role]);
+
+        state.premium = role === "premium" || role === "admin";
+        state.agent = "Phoenix";
+        state.currentId = null;
+
+        sauvegarder();
+
+        window.location.href = chatUrl;
+    }
+
+    // Connexion classique simulée
+    document.getElementById("loginForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const username = document
+                .getElementById("username")
+                .value.trim();
+
+            localStorage.setItem("valorantDemoRole", "user");
+            localStorage.setItem("valorantPseudo", username);
+
+            state.premium = false;
+            state.agent = "Phoenix";
+            state.currentId = null;
+
+            sauvegarder();
+
+            window.location.href = chatUrl;
+        });
+
+    // Restaurer le protocole sélectionné
+    document.addEventListener("DOMContentLoaded", () => {
+        choisirProtocole(state.protocol);
+    });
+</script>
+
 </body>
 </html>

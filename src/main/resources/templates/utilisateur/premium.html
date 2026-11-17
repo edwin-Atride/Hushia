@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::main})}">
+
+<main class="content-page premium-page">
+
+    <div class="premium-heading">
+        <div>
+            <p class="premium-eyebrow">VALORANT IA PREMIUM</p>
+            <h2>Ton espace Premium</h2>
+            <p class="page-subtitle">
+                Choisis la personnalité de ton agent IA
+                et personnalise ton expérience.
+            </p>
+        </div>
+
+        <span class="premium-status">★ Premium actif</span>
+    </div>
+
+    <!-- PRÉSENTATION -->
+    <section class="info-card premium-intro">
+        <h3>Bienvenue dans ton espace Premium</h3>
+        <p>
+            Accède à plusieurs personnalités inspirées des
+            agents de Valorant. Chaque agent possède une
+            façon différente de s'exprimer.
+        </p>
+        <p>
+            Le modèle IA reste celui défini par
+            l'administrateur.
+        </p>
+    </section>
+
+    <!-- SÉLECTION DES AGENTS -->
+    <h3 class="premium-section-title">
+        Choisis ton agent
+    </h3>
+
+    <div class="premium-agents">
+
+        <button class="premium-agent-card"
+                type="button"
+                data-agent="Phoenix">
+            <span class="premium-agent-icon">🔥</span>
+            <strong>Phoenix</strong>
+            <small>Énergique et confiant</small>
+            <span class="premium-agent-tag">Gratuit</span>
+        </button>
+
+        <button class="premium-agent-card"
+                type="button"
+                data-agent="Yoru">
+            <span class="premium-agent-icon">🌀</span>
+            <strong>Yoru</strong>
+            <small>Provocateur et rusé</small>
+            <span class="premium-agent-tag">Premium</span>
+        </button>
+
+        <button class="premium-agent-card"
+                type="button"
+                data-agent="Skye">
+            <span class="premium-agent-icon">🌿</span>
+            <strong>Skye</strong>
+            <small>Encourageante et positive</small>
+            <span class="premium-agent-tag">Premium</span>
+        </button>
+
+        <button class="premium-agent-card"
+                type="button"
+                data-agent="Chamber">
+            <span class="premium-agent-icon">🎯</span>
+            <strong>Chamber</strong>
+            <small>Élégant et précis</small>
+            <span class="premium-agent-tag">Premium</span>
+        </button>
+
+        <button class="premium-agent-card"
+                type="button"
+                data-agent="Jett">
+            <span class="premium-agent-icon">💨</span>
+            <strong>Jett</strong>
+            <small>Rapide et compétitive</small>
+            <span class="premium-agent-tag">Premium</span>
+        </button>
+
+        <button class="premium-agent-card"
+                type="button"
+                data-agent="Sage">
+            <span class="premium-agent-icon">❄️</span>
+            <strong>Sage</strong>
+            <small>Calme et bienveillante</small>
+            <span class="premium-agent-tag">Premium</span>
+        </button>
+
+    </div>
+
+    <!-- AGENT ACTIF -->
+    <section class="info-card premium-selection">
+        <div>
+            <h3>Personnalité sélectionnée</h3>
+            <p id="premiumSelectedAgent">
+                Phoenix
+            </p>
+        </div>
+
+        <button type="button"
+                class="primary"
+                id="premiumStartChat">
+            Discuter avec cet agent
+        </button>
+    </section>
+
+    <p id="premiumFeedback"
+       class="premium-feedback"
+       role="status"
+       aria-live="polite"></p>
+
+</main>
+</html>

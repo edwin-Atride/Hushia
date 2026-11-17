@@ -1,24 +1,119 @@
 
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
       th:fragment="layout(contenu)">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hush IA</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Valorant IA</title>
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
     <link rel="stylesheet"
-          th:href="@{/vendor/bootstrap/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+          href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
 </head>
-<body>
-<header th:replace="~{fragments/header :: header}"></header>
 
-<main th:replace="${contenu}"></main>
+<body class="alpha">
 
-<footer th:replace="~{fragments/footer :: footer}"></footer>
+<div class="app">
 
-<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <!-- MENU DE GAUCHE -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <img th:src="@{/img/logo.png}"
+                 alt="Valorant IA"
+                 class="brand-logo">
+
+            <span>Valorant IA</span>
+        </div>
+
+        <button type="button"
+                class="new-chat"
+                onclick="nouvelleConversation()">
+            + Nouvelle conversation
+        </button>
+
+
+
+        <nav class="navigation">
+
+            <a th:href="@{/chat}" class="nav-link">
+                ◈ Accueil
+            </a>
+
+
+            <!-- Visible uniquement pour Premium et Admin -->
+
+            <a id="premiumLink"
+               th:href="@{/premium}"
+               class="nav-link premium-link"
+               hidden>
+                ★ Premium
+            </a>
+
+
+
+            <a id="adminLink"
+               th:href="@{/admin}"
+               class="nav-link admin-link"
+               hidden>
+                ⚙ Panel Admin
+            </a>
+
+        </nav>
+
+
+        <div class="section-label">
+            Conversations récentes
+        </div>
+
+        <div id="historique" class="historique">
+            <p class="muted">Aucune conversation</p>
+        </div>
+
+
+
+        <div class="sidebar-bottom">
+
+            <div class="connected-profile">
+                <span>Compte connecté</span>
+                <strong id="profileName">Utilisateur</strong>
+
+                <button type="button"
+                        class="logout-btn"
+                        onclick="deconnexion()">
+                    ↪ Déconnexion
+                </button>
+            </div>
+
+        </div>
+
+
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="main-container">
+
+        <div th:replace="~{fragments/header :: header}"></div>
+
+        <main th:replace="${contenu}"></main>
+
+        <div th:replace="~{fragments/footer :: footer}"></div>
+
+    </div>
+
+</div>
+
 <script th:src="@{/js/app.js}"></script>
+
 </body>
 </html>
