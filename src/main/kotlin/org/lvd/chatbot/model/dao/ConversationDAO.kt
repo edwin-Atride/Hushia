@@ -1,0 +1,9 @@
+package org.lvd.chatbot.model.dao
+
+
+import org.lvd.chatbot.model.entity.Conversation
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface ConversationDAO : JpaRepository<Conversation, Long> {
+    fun findAllByOrderByDateModificationDesc(): List<Conversation>
+}
