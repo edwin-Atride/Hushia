@@ -351,109 +351,161 @@ function afficherMessages() {
     }
 }
 
-function genererReponse(question, agent) {
-    const texte = question.toLowerCase();
 
-    let conseil;
+/* =============================
+   CHAT CONNECTÉ AU BACKEND DU TP
+   ============================= */
 
-    if (texte.includes("aim") || texte.includes("vise")) {
-        conseil =
-            "Travaille ton placement de viseur à hauteur de tête. " +
-            "Privilégie des tirs contrôlés et entraîne-toi " +
-            "régulièrement en Deathmatch.";
-    } else if (texte.includes("attaque")) {
-        conseil =
-            "Coordonne tes capacités avec ton équipe. " +
-            "Prends le contrôle des zones importantes avant " +
-            "d'entrer sur le site et évite les duels isolés.";
-    } else if (texte.includes("ranked") ||
-        texte.includes("rang")) {
-        conseil =
-            "Concentre-toi sur ta régularité, les communications " +
-            "utiles et tes décisions. Analyse une erreur " +
-            "importante après chaque partie.";
-    } else if (texte.includes("phoenix")) {
-        conseil =
-            "Avec Phoenix, utilise tes flashs pour prendre " +
-            "des duels favorables, ton mur pour couper " +
-            "les lignes de vue et ton ultime pour créer de l'espace.";
+let envoiEnCours = false;
+let modeleMistralCache = null;
+
+function afficherErreurChat(message) {
+    console.error(message);
+    const node = document.getElementById("chatError");
+    if (node) {
+        node.textContent = message;
+        node.hidden = false;
     } else {
-        conseil =
-            "Pour progresser, travaille les fondamentaux : " +
-            "placement du viseur, utilisation des capacités, " +
-            "communication et déplacements. " +
-            "Donne-moi une carte ou une situation précise.";
+        alert(message);
     }
+}
 
-    const personnalites = {
-        Phoenix:
-            "Yo ! On va faire ça propre. 🔥\n\n",
-        Yoru:
-            "T'as besoin d'un peu de ruse. 🌀\n\n",
-        Skye:
-            "Allez, on progresse ensemble ! 🌿\n\n",
-        Chamber:
-            "La précision fait toute la différence. 🎯\n\n",
-        Jett:
-            "On garde le rythme, let's go ! 💨\n\n",
-        Sage:
-            "Prenons le temps d'analyser la situation. ❄️\n\n"
+function effacerErreurChat() {
+    const node = document.getElementById("chatError");
+    if (node) {
+        node.hidden = true;
+        node.textContent = "";
+    }
+}
+
+// Le ChatController de l'étape 10 sert le template utilisateur/chat.html sur GET /.
+// Ce template contient le select des modèles chargés depuis ModeleIADAO.
+async function chargerModeleMistral() {
+    if (modeleMistralCache) return modeleMistralCache;
+    const reponse = await fetch("/", { credentials: "same-origin" });
+    if (!reponse.ok) throw new Error(`GET / renvoie HTTP ${reponse.status}`);
+    const page = new DOMParser().parseFromString(await reponse.text(), "text/html");
+    const choix = [...page.querySelectorAll('select[name="idModele"] option')]
+        .find(o => o.value && /mistral/i.test(o.textContent));
+    if (!choix) {
+        throw new Error("Impossible de trouver Mistral sur GET /. Vérifie que ChatController.accueil() renvoie utilisateur/chat avec les modèles de MariaDB.");
+    }
+    modeleMistralCache = {
+        id: choix.value,
+        csrf: page.querySelector('input[name="_csrf"]')?.value ||
+            page.querySelector('meta[name="_csrf"]')?.content || null
     };
-
-    return personnalites[agent] + conseil;
+    return modeleMistralCache;
 }
 
-function envoyerMessage(texte) {
-    texte = texte.trim();
-    if (!texte) return;
+async function envoyerMessage(texte) {
+    texte = String(texte || "").trim();
+    if (!texte || envoiEnCours) return;
+    envoiEnCours = true;
+    effacerErreurChat();
+    const btn = document.querySelector('#chatForm button[type="submit"]');
+    if (btn) btn.disabled = true;
+    const champ = document.getElementById("messageInput");
 
-    let conversation = conversationActuelle();
+    // Une conversation locale de l'ancienne maquette n'a pas d'identifiant MariaDB.
+    const ancienne = conversationActuelle();
+    const backendId = ancienne?.backendId || null;
+    let conversation = backendId ? ancienne : null;
+    let transitoire = false;
 
-    if (!conversation) {
-        conversation = creerConversation(texte);
+    try {
+        // Envoi en formulaire classique vers les routes existantes du TP.
+        const modele = await chargerModeleMistral();
+        const donnees = new URLSearchParams();
+        donnees.set("prompt", texte);
+        if (!backendId) donnees.set("idModele", modele.id);
+        if (modele.csrf) donnees.set("_csrf", modele.csrf);
+
+        // Affiche immédiatement la question mais pas de réponse simulée.
+        if (!conversation) {
+            conversation = creerConversation(texte);
+            transitoire = true;
+        }
+        conversation.messages.push({ role: "user", content: texte });
+        afficherHistorique();
+        afficherMessages();
+
+        const cible = backendId
+            ? `/conversations/${encodeURIComponent(backendId)}/messages`
+            : "/conversations";
+        const reponse = await fetch(cible, {
+            method: "POST",
+            credentials: "same-origin",
+            redirect: "follow",
+            headers: {"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
+            body: donnees
+        });
+        if (!reponse.ok) throw new Error(`Le serveur a renvoyé HTTP ${reponse.status} pour ${cible}.`);
+
+        const chemin = new URL(reponse.url).pathname;
+        const match = chemin.match(/^\/conversations\/(\d+)\/?$/);
+        if (!match) {
+            throw new Error(`Redirection inattendue (${chemin}). Vérifie les routes du ChatController.`);
+        }
+        const idReel = Number(match[1]);
+        const page = new DOMParser().parseFromString(await reponse.text(), "text/html");
+        const noeuds = [...page.querySelectorAll(".message-content")];
+        if (!noeuds.length) {
+            throw new Error("La page serveur ne contient aucun .message-content. Vérifie utilisateur/chat.html.");
+        }
+        const messages = noeuds.map(el => ({
+            role: el.parentElement?.querySelector("strong")?.textContent.trim().toUpperCase().includes("ASSISTANT")
+                ? "assistant" : "user",
+            content: el.textContent || ""
+        }));
+        conversation.backendId = idReel;
+        conversation.messages = messages;
+        sauvegarder();
+        afficherHistorique();
+        afficherMessages();
+        if (!messages.some(m => m.role === "assistant")) {
+            afficherErreurChat("Ta question est enregistrée dans MariaDB mais aucune réponse IA n'est présente. Regarde l'erreur Mistral dans la console IntelliJ (ChatController catch).");
+        } else if (champ) {
+            champ.value = "";
+        }
+    } catch (erreur) {
+        // Ne pas présenter un échec API comme une réponse réussie.
+        if (conversation) {
+            conversation.messages = conversation.messages.filter((m, i, a) =>
+                !(i === a.length - 1 && m.role === "user" && m.content === texte));
+            if (transitoire && !conversation.backendId) {
+                state.conversations = state.conversations.filter(c => c !== conversation);
+                state.currentId = null;
+            }
+            sauvegarder();
+            afficherHistorique();
+            afficherMessages();
+        }
+        afficherErreurChat("Envoi impossible : " + erreur.message);
+    } finally {
+        envoiEnCours = false;
+        if (btn) btn.disabled = false;
+        champ?.focus();
     }
-
-    conversation.messages.push({
-        role: "user",
-        content: texte
-    });
-
-    conversation.messages.push({
-        role: "assistant",
-        content: genererReponse(texte, state.agent)
-    });
-
-    sauvegarder();
-    afficherHistorique();
-    afficherMessages();
 }
 
-function questionRapide(question) {
-    envoyerMessage(question);
-}
+function questionRapide(question) { envoyerMessage(question); }
 
 /* =============================
    INITIALISATION
    ============================= */
-
 document.addEventListener("DOMContentLoaded", () => {
     appliquerProtocole();
     actualiserAgents();
     afficherHistorique();
     afficherMessages();
-
     const form = document.getElementById("chatForm");
     const input = document.getElementById("messageInput");
-
     if (form && input) {
         form.addEventListener("submit", event => {
             event.preventDefault();
-
             envoyerMessage(input.value);
-            input.value = "";
-            input.focus();
         });
-
         input.addEventListener("keydown", event => {
             if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -462,7 +514,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-
 
 /* Affichage du bouton administrateur */
 
@@ -504,8 +555,8 @@ function deconnexion() {
 
     sauvegarder();
 
-    // Retour à la connexion
-    window.location.href = "/connexion";
+    // Retour à la connexion de la maquette (si route existante).
+    window.location.assign("/connexion");
 }
 
 /* Affichage des onglets selon le profil */
@@ -610,7 +661,9 @@ function reinitialiserConfigAdmin() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const adminPage = document.querySelector(".admin-page");
+    const adminPage = document.querySelector(
+        ".admin-page:not(.admin-model-page)"
+    );
 
     // Ne rien faire sur les autres pages.
     if (!adminPage) return;

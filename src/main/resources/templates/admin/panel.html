@@ -4,130 +4,571 @@
       xmlns:th="http://www.thymeleaf.org"
       th:replace="~{base :: layout(~{::main})}">
 
-<main class="content-page admin-page">
+<main class="content-page admin-page admin-model-page">
 
-    <div class="admin-heading">
+    <style>
+        .admin-model-page {
+            padding: 24px;
+            color: #f5f0ff;
+            width: 100%;
+        }
+
+        .models-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .models-heading h2 {
+            margin: 0;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .models-heading p {
+            margin: 7px 0 0;
+            color: #aaa0bd;
+            font-size: 14px;
+        }
+
+        .models-count {
+            background: #342046;
+            color: #c992ff;
+            padding: 9px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .models-panel {
+            background: #1b1528;
+            border: 1px solid #382945;
+            border-radius: 16px;
+            padding: 22px;
+            width: 100%;
+        }
+
+        .models-toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .models-toolbar input,
+        .models-toolbar select {
+            background: #251b34;
+            border: 1px solid #453354;
+            color: white;
+            border-radius: 10px;
+            padding: 12px 15px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .models-toolbar input {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .models-toolbar select {
+            width: 210px;
+        }
+
+        .models-toolbar input:focus,
+        .models-toolbar select:focus {
+            border-color: #a34ef4;
+        }
+
+        .models-toolbar input::placeholder {
+            color: #9e91ae;
+        }
+
+        .models-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .models-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .models-table th {
+            padding: 14px 12px;
+            font-size: 12px;
+            color: #aa99bf;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .models-table td {
+            padding: 16px 12px;
+            border-top: 1px solid #352a42;
+            font-size: 13px;
+        }
+
+        .model-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .model-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #493067;
+            color: #e8ceff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .model-id {
+            color: #b6aac6;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .model-status {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .model-status.active {
+            background: #263c31;
+            color: #76dba0;
+        }
+
+        .model-status.inactive {
+            background: #3b3043;
+            color: #c5b7d0;
+        }
+
+        .model-action {
+            background: #30203f;
+            border: 1px solid #654383;
+            color: #d9b4ff;
+            padding: 8px 13px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .model-action:hover {
+            background: #8943d4;
+            color: white;
+        }
+
+        .models-empty {
+            color: #aaa0bd;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .model-details {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #513a69;
+            background: #251b34;
+        }
+
+        .model-details h3 {
+            margin: 0 0 15px;
+            font-size: 17px;
+        }
+
+        .model-details p {
+            margin: 10px 0;
+            color: #c9bed6;
+            overflow-wrap: anywhere;
+        }
+
+        .model-details strong {
+            color: white;
+        }
+
+        .models-note {
+            margin-top: 17px;
+            font-size: 12px;
+            color: #9b8daa;
+        }
+
+        @media (max-width: 700px) {
+            .models-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .models-toolbar {
+                flex-direction: column;
+            }
+
+            .models-toolbar select {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <!-- TITRE -->
+    <div class="models-heading">
         <div>
-            <p class="admin-eyebrow">ADMINISTRATION</p>
-            <h2>Panel Admin</h2>
-            <p class="page-subtitle">
-                Configure le fonctionnement de Valorant IA.
+            <h2>Administration · Modèles d'IA</h2>
+            <p>
+                Consulte les modèles disponibles
+                dans Valorant IA.
             </p>
         </div>
 
-        <span class="admin-status">Mode démonstration</span>
+        <span class="models-count" id="modelsCount">
+            Chargement...
+        </span>
     </div>
 
-    <div class="admin-grid">
+    <!-- TABLEAU -->
+    <section class="models-panel">
 
-        <!-- CONFIGURATION DU MODELE -->
-        <section class="info-card">
-            <h3>Modèle d'intelligence artificielle</h3>
-            <p>
-                Choisis le modèle que tous les utilisateurs
-                utiliseront pour discuter.
-            </p>
+        <!-- FILTRES -->
+        <div class="models-toolbar">
 
-            <label class="admin-label" for="aiModel">
-                Modèle IA
-            </label>
+            <input type="search"
+                   id="modelSearch"
+                   placeholder="Rechercher un modèle...">
 
-            <select id="aiModel" class="admin-field">
-                <option value="gpt-4.1-mini">GPT-4.1 mini</option>
-                <option value="gpt-4.1">GPT-4.1</option>
-                <option value="gpt-5-mini">GPT-5 mini</option>
-                <option value="custom">Modèle personnalisé</option>
+            <select id="providerFilter">
+                <option value="">
+                    Tous les fournisseurs
+                </option>
             </select>
 
-            <label class="admin-label" for="aiTemperature">
-                Température :
-                <strong id="temperatureValue">0.7</strong>
-            </label>
+        </div>
 
-            <input id="aiTemperature"
-                   class="admin-range"
-                   type="range"
-                   min="0"
-                   max="2"
-                   step="0.1"
-                   value="0.7">
+        <div class="models-table-wrapper">
 
-            <p class="admin-help">
-                Une température basse donne des réponses plus
-                prévisibles. Une température haute apporte
-                davantage de variété.
-            </p>
-        </section>
+            <table class="models-table">
+                <thead>
+                <tr>
+                    <th>Modèle</th>
+                    <th>Fournisseur</th>
+                    <th>Identifiant API</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
 
-        <!-- ETAT DU CHAT -->
-        <section class="info-card">
-            <h3>État du chatbot</h3>
+                <tbody id="modelsTableBody">
+                <tr>
+                    <td colspan="5" class="models-empty">
+                        Chargement des modèles...
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <!-- DÉTAILS -->
+        <div class="model-details"
+             id="modelDetails"
+             hidden>
+
+            <h3 id="detailName"></h3>
+
             <p>
-                Prépare les options générales de l'application.
+                <strong>Fournisseur :</strong>
+                <span id="detailProvider"></span>
             </p>
 
-            <label class="admin-check">
-                <input id="aiEnabled"
-                       type="checkbox"
-                       checked>
-                <span>Activer le chatbot IA</span>
-            </label>
-
-            <label class="admin-check">
-                <input id="historyEnabled"
-                       type="checkbox"
-                       checked>
-                <span>Activer l'historique des conversations</span>
-            </label>
-
-            <div class="admin-summary">
-                <span>Protocole sélectionné</span>
-                <strong id="adminProtocol">Alpha</strong>
-            </div>
-
-            <div class="admin-summary">
-                <span>Profil connecté</span>
-                <strong>Administrateur (démo)</strong>
-            </div>
-        </section>
-
-        <!-- INSTRUCTIONS IA -->
-        <section class="info-card admin-wide">
-            <h3>Instructions générales de l'IA</h3>
             <p>
-                Ces instructions serviront de base à tous
-                les agents de Valorant IA.
+                <strong>Identifiant API :</strong>
+                <span id="detailApi"></span>
             </p>
 
-            <label class="admin-label" for="aiPrompt">
-                Prompt système
-            </label>
+            <p>
+                <strong>Statut :</strong>
+                <span id="detailStatus"></span>
+            </p>
 
-            <textarea id="aiPrompt"
-                      class="admin-field admin-textarea"
-                      rows="6">Tu es Valorant IA, un assistant spécialisé dans le jeu Valorant. Tu aides les joueurs à progresser en expliquant les stratégies, les mécaniques, les rôles des agents et les bonnes pratiques. Tu adaptes ton ton à la personnalité de l'agent sélectionné, sans inventer de statistiques.</textarea>
-        </section>
+            <button class="model-action"
+                    type="button"
+                    id="closeDetails">
+                Fermer
+            </button>
 
-    </div>
+        </div>
 
-    <div class="admin-actions">
-        <button type="button"
-                class="admin-secondary"
-                id="resetAdmin">
-            Réinitialiser
-        </button>
+        <p class="models-note">
+            Les modèles sont récupérés depuis le serveur.
+            Aucune clé API n'est affichée.
+        </p>
 
-        <button type="button"
-                class="primary"
-                id="saveAdmin">
-            Enregistrer les paramètres
-        </button>
-    </div>
+    </section>
 
-    <p id="adminFeedback"
-       class="admin-feedback"
-       role="status"
-       aria-live="polite"></p>
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const table = document.getElementById(
+                "modelsTableBody"
+            );
+
+            if (!table) return;
+
+            const search = document.getElementById(
+                "modelSearch"
+            );
+
+            const filter = document.getElementById(
+                "providerFilter"
+            );
+
+            const count = document.getElementById(
+                "modelsCount"
+            );
+
+            const details = document.getElementById(
+                "modelDetails"
+            );
+
+            let models = [];
+
+            function normalizeModel(m) {
+                return {
+                    nom: String(m.nom ?? m.name ?? ""),
+                    fournisseur: String(
+                        m.fournisseur ??
+                        m.fournisseurIA?.nom ??
+                        m.fourniseurIA?.nom ??
+                        ""
+                    ),
+                    identifiant: String(
+                        m.identifiantAPI ??
+                        m.identifiantApi ??
+                        m.nomAPI ??
+                        m.nom ??
+                        ""
+                    ),
+                    actif: m.actif === true ||
+                        m.active === true
+                };
+            }
+
+            function cellule(texte, classe = "") {
+                const td = document.createElement("td");
+
+                if (classe) td.className = classe;
+
+                td.textContent = texte;
+                return td;
+            }
+
+            function afficherModeles() {
+                const terme = search.value
+                    .toLowerCase()
+                    .trim();
+
+                const fournisseur = filter.value;
+
+                const resultats = models.filter(m => {
+                    const correspond =
+                        m.nom.toLowerCase().includes(terme) ||
+                        m.identifiant
+                            .toLowerCase()
+                            .includes(terme);
+
+                    return correspond &&
+                        (!fournisseur ||
+                            m.fournisseur === fournisseur);
+                });
+
+                table.replaceChildren();
+
+                count.textContent =
+                    models.length + " modèle(s) disponible(s)";
+
+                if (!resultats.length) {
+                    const tr = document.createElement("tr");
+                    const td = cellule(
+                        "Aucun modèle trouvé.",
+                        "models-empty"
+                    );
+                    td.colSpan = 5;
+                    tr.appendChild(td);
+                    table.appendChild(tr);
+                    return;
+                }
+
+                resultats.forEach(m => {
+                    const tr = document.createElement("tr");
+
+                    const nameCell = document.createElement("td");
+                    const nameBox = document.createElement("div");
+                    nameBox.className = "model-name";
+
+                    const avatar = document.createElement("span");
+                    avatar.className = "model-avatar";
+                    avatar.textContent = m.nom
+                        .slice(0, 2)
+                        .toUpperCase();
+
+                    const name = document.createElement("span");
+                    name.textContent = m.nom;
+
+                    nameBox.append(avatar, name);
+                    nameCell.appendChild(nameBox);
+
+                    const statusCell =
+                        document.createElement("td");
+
+                    const status =
+                        document.createElement("span");
+
+                    status.className = "model-status " +
+                        (m.actif ? "active" : "inactive");
+
+                    status.textContent =
+                        m.actif ? "Actif" : "Inactif";
+
+                    statusCell.appendChild(status);
+
+                    const actionCell =
+                        document.createElement("td");
+
+                    const button =
+                        document.createElement("button");
+
+                    button.type = "button";
+                    button.className = "model-action";
+                    button.textContent = "Voir";
+
+                    button.addEventListener("click", () => {
+                        document.getElementById(
+                            "detailName"
+                        ).textContent = m.nom;
+
+                        document.getElementById(
+                            "detailProvider"
+                        ).textContent = m.fournisseur;
+
+                        document.getElementById(
+                            "detailApi"
+                        ).textContent = m.identifiant;
+
+                        document.getElementById(
+                            "detailStatus"
+                        ).textContent =
+                            m.actif ? "Actif" : "Inactif";
+
+                        details.hidden = false;
+                    });
+
+                    actionCell.appendChild(button);
+
+                    tr.append(
+                        nameCell,
+                        cellule(m.fournisseur),
+                        cellule(m.identifiant, "model-id"),
+                        statusCell,
+                        actionCell
+                    );
+
+                    table.appendChild(tr);
+                });
+            }
+
+            function remplirFournisseurs() {
+                const noms = [...new Set(
+                    models.map(m => m.fournisseur)
+                )].filter(Boolean);
+
+                filter.replaceChildren();
+
+                const all = document.createElement("option");
+                all.value = "";
+                all.textContent = "Tous les fournisseurs";
+                filter.appendChild(all);
+
+                noms.forEach(nom => {
+                    const option =
+                        document.createElement("option");
+
+                    option.value = nom;
+                    option.textContent = nom;
+                    filter.appendChild(option);
+                });
+            }
+
+            async function chargerModeles() {
+                try {
+                    const response = await fetch(
+                        "/api/modeles-disponibles",
+                        { credentials: "same-origin" }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "HTTP " + response.status
+                        );
+                    }
+
+                    const data = await response.json();
+
+                    if (!Array.isArray(data)) {
+                        throw new Error(
+                            "Format de réponse invalide"
+                        );
+                    }
+
+                    models = data.map(normalizeModel);
+
+                    remplirFournisseurs();
+                    afficherModeles();
+
+                } catch (error) {
+                    console.error(error);
+
+                    table.replaceChildren();
+
+                    const tr = document.createElement("tr");
+                    const td = cellule(
+                        "Impossible de charger les modèles : " +
+                        error.message,
+                        "models-empty"
+                    );
+
+                    td.colSpan = 5;
+                    tr.appendChild(td);
+                    table.appendChild(tr);
+
+                    count.textContent = "Indisponible";
+                }
+            }
+
+            search.addEventListener(
+                "input", afficherModeles
+            );
+
+            filter.addEventListener(
+                "change", afficherModeles
+            );
+
+            document.getElementById("closeDetails")
+                .addEventListener("click", () => {
+                    details.hidden = true;
+                });
+
+            chargerModeles();
+        });
+    </script>
 
 </main>
 </html>

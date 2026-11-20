@@ -3,7 +3,6 @@ package org.lvd.chatbot.service
 import org.lvd.chatbot.model.entity.ModeleIA
 import org.springframework.stereotype.Component
 
-
 @Component
 class IAServiceFactory(
     private val services: List<IAService>
@@ -11,11 +10,8 @@ class IAServiceFactory(
 
     fun getService(modele: ModeleIA): IAService {
 
-        val fournisseur = modele.fournisseur?.nom
-            ?: throw IllegalArgumentException(
-                "Aucun fournisseur associé au modèle"
-            )
-// Sélection du service correspondant au fournisseur
+        val fournisseur = modele.fournisseur.nom
+
         return services.firstOrNull {
             it.getFournisseur().equals(
                 fournisseur,
